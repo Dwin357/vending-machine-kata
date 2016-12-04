@@ -87,6 +87,47 @@ RSpec.describe CoinRegister do
       it 'resets balance to 0' do
         expect{ subject.make_change }.to change{ subject.balance }.from(65).to(0)
       end
+      it 'deducts 2 quarters from coin stock' do
+        expect{ subject.make_change }
+          .to change{ subject.send(:coin_stock)[:quarter].size }.from(10).to(8)
+      end
+      it 'deducts 1 dime from coin stock' do
+        expect{ subject.make_change }
+          .to change{ subject.send(:coin_stock)[:dime].size }.from(10).to(9)
+      end
+      it 'deducts 1 nickel from coin stock' do
+        expect{ subject.make_change }
+          .to change{ subject.send(:coin_stock)[:nickel].size }.from(10).to(9)
+      end            
     end
+  end
+
+  describe 'change_avaliable?' do
+    context 'with coins' do
+      it 'returns true' do
+        expect(subject.change_avaliable?).to be true
+      end
+    end
+    context 'with no nickels' do
+      before{ subject.send(:coin_stock)[:nickel] = [] }
+      it 'returns false' do
+        expect(subject.change_avaliable?).to be false
+      end
+    end
+    context 'with no dimes' do
+      before{ subject.send(:coin_stock)[:dime] = [] }
+      it 'returns false' do
+        expect(subject.change_avaliable?).to be false
+      end
+    end   
+    context 'with exactly one nickel and one dime' do
+      before do
+        subject.send(:coin_stock)[:nickel] = [nickel]
+        subject.send(:coin_stock)[:dime]   = [dime]        
+      end
+      it 'returns false' do
+        expect(subject.change_avaliable?).to be false
+      end
+    end     
   end
 end

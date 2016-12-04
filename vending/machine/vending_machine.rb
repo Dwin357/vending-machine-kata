@@ -101,7 +101,11 @@ class VendingMachine
 
 
   def display_default
-    coin_register.balance == 0 ? 'INSERT COINS' : display_balance
+    coin_register.balance == 0 ? display_prompt : display_balance
+  end
+
+  def display_prompt
+    coin_register.change_avaliable? ? 'INSERT COINS' : 'EXACT CHANGE ONLY'
   end
   
   def display_balance

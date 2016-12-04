@@ -30,11 +30,20 @@ RSpec.describe 'LEGAL_TENDER' do
     it 'has value of 1' do
       expect(subject[:value]).to eq 1
     end
-    it 'has weight of 3' do
-      expect(subject[:weight]).to eq 3
+    it 'has key properties' do
+      expect(subject).to have_key :properties
     end
-    it 'has size of 3' do
-      expect(subject[:size]).to eq 3
+    describe 'properties' do
+      subject { LEGAL_TENDER[:penny][:properties] }
+      it 'is immutable' do
+        expect{ subject[:size] = 10 }.to raise_error RuntimeError
+      end
+      it 'has weight of 3' do
+        expect(subject[:weight]).to eq 3
+      end
+      it 'has size of 3' do
+        expect(subject[:size]).to eq 3
+      end
     end
   end
 
@@ -48,11 +57,20 @@ RSpec.describe 'LEGAL_TENDER' do
     it 'has value of 5' do
       expect(subject[:value]).to eq 5
     end
-    it 'has weight of 5' do
-      expect(subject[:weight]).to eq 5
+    it 'has key properties' do
+      expect(subject).to have_key :properties
     end
-    it 'has size of 4' do
-      expect(subject[:size]).to eq 4
+    describe 'properties' do
+      subject { LEGAL_TENDER[:nickel][:properties] }
+      it 'is immutable' do
+        expect{ subject[:size] = 10 }.to raise_error RuntimeError
+      end
+      it 'has weight of 3' do
+        expect(subject[:weight]).to eq 5
+      end
+      it 'has size of 3' do
+        expect(subject[:size]).to eq 4
+      end
     end
   end
 
@@ -66,11 +84,20 @@ RSpec.describe 'LEGAL_TENDER' do
     it 'has value of 10' do
       expect(subject[:value]).to eq 10
     end
-    it 'has weight of 1' do
-      expect(subject[:weight]).to eq 1
+    it 'has key properties' do
+      expect(subject).to have_key :properties
     end
-    it 'has size of 2' do
-      expect(subject[:size]).to eq 2
+    describe 'properties' do
+      subject { LEGAL_TENDER[:dime][:properties] }
+      it 'is immutable' do
+        expect{ subject[:size] = 10 }.to raise_error RuntimeError
+      end
+      it 'has weight of 1' do
+        expect(subject[:weight]).to eq 1
+      end
+      it 'has size of 2' do
+        expect(subject[:size]).to eq 2
+      end
     end
   end
 
@@ -84,11 +111,20 @@ RSpec.describe 'LEGAL_TENDER' do
     it 'has value of 25' do
       expect(subject[:value]).to eq 25
     end
-    it 'has weight of 7' do
-      expect(subject[:weight]).to eq 7
+    it 'has key properties' do
+      expect(subject).to have_key :properties
     end
-    it 'has size of 7' do
-      expect(subject[:size]).to eq 7
+    describe 'properties' do
+      subject { LEGAL_TENDER[:quarter][:properties] }
+      it 'is immutable' do
+        expect{ subject[:size] = 10 }.to raise_error RuntimeError
+      end
+      it 'has weight of 7' do
+        expect(subject[:weight]).to eq 7
+      end
+      it 'has size of 7' do
+        expect(subject[:size]).to eq 7
+      end
     end
   end  
 end

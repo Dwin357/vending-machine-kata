@@ -113,9 +113,21 @@ RSpec.describe VendingMachine do
     end
     context 'with no message' do
       context 'and no balance' do
-        it 'displays default prompt repeatedly' do
-          expect(subject.display).to eq 'INSERT COINS'
-          expect(subject.display).to eq 'INSERT COINS'          
+        context 'and sufficient change' do
+          it "displays 'INSERT COINS' repeatedly" do
+            expect(subject.display).to eq 'INSERT COINS'
+            expect(subject.display).to eq 'INSERT COINS'          
+          end
+        end
+        context 'and insufficient change' do
+          before do
+            allow_any_instance_of(CoinRegister)
+              .to receive(:change_avaliable?).and_return(false)
+          end
+          it "displays 'EXACT CHANGE ONLY' repeatedly" do
+            expect(subject.display).to eq 'EXACT CHANGE ONLY'
+            expect(subject.display).to eq 'EXACT CHANGE ONLY'          
+          end
         end
       end
       context 'and a balance' do
