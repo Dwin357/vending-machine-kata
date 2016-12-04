@@ -51,4 +51,11 @@ RSpec.describe CoinReceptor do
       expect{ subject.insert(penny) }.not_to change{ subject.balance }
     end
   end
+
+  describe 'sale' do
+    before(:each) { subject.insert(dime) }
+    it 'deducts amount from balance' do
+      expect{ subject.sale(5) }.to change{ subject.balance }.from(10).to(5)
+    end
+  end
 end

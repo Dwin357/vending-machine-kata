@@ -16,10 +16,18 @@ class CoinReceptor
     end
   end
 
+  def sale(amount)
+    subtract_balance(amount)
+  end
+
   private
 
-  def add_balance(value)
-    @balance += value
+  def add_balance(amount)
+    @balance += amount
+  end
+
+  def subtract_balance(amount)
+    @balance -= amount
   end
 
   def valid?(coin)
