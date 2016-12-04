@@ -1,4 +1,4 @@
-require_relative '../app/coin_receptor'
+require_relative '../../../vending/components/coin_receptor'
 
 RSpec.describe CoinReceptor do
 
