@@ -104,7 +104,7 @@ RSpec.describe VendingMachine do
   end
 
   describe '#cola' do
-    context 'with enough money' do
+    context 'with $1.25' do
       before { 5.times{ subject.insert(quarter) } }
       it "says 'THANK YOU'" do
         expect(subject.cola).to eq 'THANK YOU'
@@ -112,6 +112,11 @@ RSpec.describe VendingMachine do
       it 'adds :cola in vending tray' do
         expect{ subject.cola }.to change{ subject.vending_tray }
           .from([]).to([:cola])
+      end
+      it 'makes change of one quarter' do
+        expect{ subject.cola }.to change{
+          subject.coin_tray.select{|coin| coin.type == :quarter }.size
+        }.from(0).to(1)
       end
     end
 
@@ -126,7 +131,7 @@ RSpec.describe VendingMachine do
   end
 
   describe '#chips' do
-    context 'with enough money' do
+    context 'with $0.60' do
       before { 6.times { subject.insert(dime) } }
       it "says 'THANK YOU'" do
         expect(subject.chips).to eq 'THANK YOU'
@@ -134,6 +139,11 @@ RSpec.describe VendingMachine do
       it 'adds :chips in vending tray' do
         expect{ subject.chips }.to change{ subject.vending_tray }
           .from([]).to([:chips])
+      end      
+      it 'makes change of one dime' do
+        expect{ subject.chips }.to change{
+          subject.coin_tray.select{|coin| coin.type == :dime }.size
+        }.from(0).to(1)
       end
     end
 
@@ -148,7 +158,7 @@ RSpec.describe VendingMachine do
   end
 
   describe '#candy' do
-    context 'with enough money' do
+    context 'with $0.75' do
       before { 3.times { subject.insert(quarter) } }
       it "says 'THANK YOU'" do
         expect(subject.candy).to eq 'THANK YOU'
@@ -156,6 +166,11 @@ RSpec.describe VendingMachine do
       it 'adds :candy in vending tray' do
         expect{ subject.candy }.to change{ subject.vending_tray }
           .from([]).to([:candy])
+      end      
+      it 'makes change of one dime' do
+        expect{ subject.candy }.to change{
+          subject.coin_tray.select{|coin| coin.type == :dime }.size
+        }.from(0).to(1)
       end
     end
 

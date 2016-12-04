@@ -58,4 +58,33 @@ RSpec.describe CoinReceptor do
       expect{ subject.sale(5) }.to change{ subject.balance }.from(10).to(5)
     end
   end
+
+  describe 'make_change' do
+    context 'with no balance' do
+      it 'returns an empty collection' do
+        expect(subject.make_change).to eq []
+      end
+    end
+    context 'with $0.65 balance' do
+      before{ subject.send(:add_balance, 65) }
+      it 'returns 2 quarter, 1 dime, 1 nickel' do
+        change = subject.make_change
+
+        # number of coins
+        expect(change.size).to be 4
+
+        # number of quarters
+        expect(change.select{|coin| coin.type == :quarter }.size).to be 2
+
+        # number of dimes
+        expect(change.select{|coin| coin.type == :dime }.size).to be 1
+
+        # number of nickels
+        expect(change.select{|coin| coin.type == :nickel }.size).to be 1
+      end
+      it 'resets balance to 0' do
+        expect{ subject.make_change }.to change{ subject.balance }.from(65).to(0)
+      end
+    end
+  end
 end

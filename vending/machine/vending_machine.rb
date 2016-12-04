@@ -37,22 +37,12 @@ class VendingMachine
   attr_reader :coin_receptor
   attr_accessor :notice
 
-  def balance_display
-    'Balance: $' + display_money(coin_receptor.balance)
-  end
-
-  def display_money(amount)
-    # hack that needs to be cleaned up
-    # need to look up float/string methods, but no internet at the moment
-    formated = (amount / 100.0).to_s
-    formated += '0' if formated[-2] == '.'
-    formated
-  end
 
   def vend(selection, price)
     if sufficient_balance?(price)
       coin_receptor.sale(price)
       dispense(selection)
+      make_change
       self.notice = 'THANK YOU'
     else
       self.notice = 'PRICE $' + display_money(price)
@@ -64,12 +54,30 @@ class VendingMachine
     vending_tray << selection
   end
 
-  def display_default
-    coin_receptor.balance == 0 ? 'INSERT COINS' : balance_display
-  end
-
   def sufficient_balance?(amount)
     coin_receptor.balance >= amount
+  end
+
+  def make_change
+    self.coin_tray += coin_receptor.make_change
+  end
+
+
+
+  def display_default
+    coin_receptor.balance == 0 ? 'INSERT COINS' : display_balance
+  end
+  
+  def display_balance
+    'Balance: $' + display_money(coin_receptor.balance)
+  end
+
+  def display_money(amount)
+    # hack that needs to be cleaned up
+    # need to look up float/string methods, but no internet at the moment
+    formated = (amount / 100.0).to_s
+    formated += '0' if formated[-2] == '.'
+    formated
   end
 
   def display_notice

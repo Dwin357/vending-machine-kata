@@ -20,6 +20,24 @@ class CoinReceptor
     subtract_balance(amount)
   end
 
+  def make_change
+    change = []
+    while balance > 0 do
+      case 
+      when balance >= 25
+        subtract_balance(25)
+        change << Coin.new(:quarter)
+      when balance >= 10
+        subtract_balance(10)
+        change << Coin.new(:dime)
+      when balance >= 5
+        subtract_balance(5)
+        change << Coin.new(:nickel)
+      end
+    end
+    change
+  end
+
   private
 
   def add_balance(amount)
