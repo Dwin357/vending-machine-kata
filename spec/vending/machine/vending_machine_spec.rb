@@ -70,6 +70,29 @@ RSpec.describe VendingMachine do
     end
   end
 
+  describe '#coin_return' do
+    context 'with no balance' do
+      it 'does not change coin tray' do
+        expect{ subject.coin_return }.not_to change{ subject.coin_tray }
+      end
+      it 'does not change display' do
+        expect{ subject.coin_return }.not_to change{ subject.display }
+      end
+    end
+    context 'with a $0.75 balance' do
+      before { 3.times{ subject.insert(quarter) } }
+      it 'changes display to INSERT COINS' do
+        expect{ subject.coin_return }.to change{ subject.display }
+          .from('Balance: $0.75').to('INSERT COINS')
+      end
+      it 'deposits three quarters in coin tray' do
+        expect{ subject.coin_return }.to change{
+          subject.coin_tray.select{|coin| coin.type == :quarter }.size
+        }.from(0).to(3)
+      end
+    end
+  end
+
   describe '#display' do
     context 'with a notice and no balance' do
       before{ subject.send(:notice=, 'message') }
@@ -108,17 +131,43 @@ RSpec.describe VendingMachine do
   describe '#cola' do
     context 'with $1.25' do
       before { 5.times{ subject.insert(quarter) } }
-      it "says 'THANK YOU'" do
-        expect(subject.cola).to eq 'THANK YOU'
+      context 'with sufficient stock' do
+        it "says 'THANK YOU'" do
+          expect(subject.cola).to eq 'THANK YOU'
+        end
+        it 'adds :cola in vending tray' do
+          expect{ subject.cola }.to change{ subject.vending_tray }
+            .from([]).to([:cola])
+        end
+        it 'makes change of one quarter' do
+          expect{ subject.cola }.to change{
+            subject.coin_tray.select{|coin| coin.type == :quarter }.size
+          }.from(0).to(1)
+        end
+        it 'reduces :cola stock by 1' do
+          expect{ subject.cola }
+            .to change{ subject.send(:vending_stock)[:cola] }.from(10).to(9)
+        end
       end
-      it 'adds :cola in vending tray' do
-        expect{ subject.cola }.to change{ subject.vending_tray }
-          .from([]).to([:cola])
-      end
-      it 'makes change of one quarter' do
-        expect{ subject.cola }.to change{
-          subject.coin_tray.select{|coin| coin.type == :quarter }.size
-        }.from(0).to(1)
+
+      context 'with insufficient stock' do
+        before { subject.send(:vending_stock)[:cola] = 0 }
+        it "says 'SOLD OUT'" do
+          expect(subject.cola).to eq 'SOLD OUT'
+        end
+        it 'does not change vending tray' do
+          expect{ subject.cola }.not_to change{ subject.vending_tray }
+        end
+        it 'does not change coin tray' do
+          expect{ subject.cola }.not_to change{ subject.coin_tray }
+        end
+        it 'does not change :cola stock' do
+          expect{ subject.cola }
+            .not_to change{ subject.send(:vending_stock)[:cola] }
+        end
+        it 'preserves the balance' do
+          expect{ subject.cola }.not_to change{ subject.display }
+        end
       end
     end
 
@@ -135,18 +184,44 @@ RSpec.describe VendingMachine do
   describe '#chips' do
     context 'with $0.60' do
       before { 6.times { subject.insert(dime) } }
-      it "says 'THANK YOU'" do
-        expect(subject.chips).to eq 'THANK YOU'
+
+      context 'and in stock' do
+        it "says 'THANK YOU'" do
+          expect(subject.chips).to eq 'THANK YOU'
+        end
+        it 'adds :chips in vending tray' do
+          expect{ subject.chips }.to change{ subject.vending_tray }
+            .from([]).to([:chips])
+        end      
+        it 'makes change of one dime' do
+          expect{ subject.chips }.to change{
+            subject.coin_tray.select{|coin| coin.type == :dime }.size
+          }.from(0).to(1)
+        end
+        it 'reduces :chips stock by 1' do
+          expect{ subject.chips }
+            .to change{ subject.send(:vending_stock)[:chips] }.from(10).to(9)
+        end
       end
-      it 'adds :chips in vending tray' do
-        expect{ subject.chips }.to change{ subject.vending_tray }
-          .from([]).to([:chips])
+      context 'but out of stock' do
+        before { subject.send(:vending_stock)[:chips] = 0 }
+        it "says 'SOLD OUT'" do
+          expect(subject.chips).to eq 'SOLD OUT'
+        end
+        it 'does not change vending tray' do
+          expect{ subject.chips }.not_to change{ subject.vending_tray }
+        end
+        it 'does not change coin tray' do
+          expect{ subject.chips }.not_to change{ subject.coin_tray }
+        end
+        it 'preserves the balance' do
+          expect{ subject.chips }.not_to change{ subject.display }
+        end
+        it 'does not change :chips stock' do
+          expect{ subject.chips }
+            .not_to change{ subject.send(:vending_stock)[:chips] }
+        end
       end      
-      it 'makes change of one dime' do
-        expect{ subject.chips }.to change{
-          subject.coin_tray.select{|coin| coin.type == :dime }.size
-        }.from(0).to(1)
-      end
     end
 
     context 'with insufficient money' do
@@ -162,18 +237,43 @@ RSpec.describe VendingMachine do
   describe '#candy' do
     context 'with $0.75' do
       before { 3.times { subject.insert(quarter) } }
-      it "says 'THANK YOU'" do
-        expect(subject.candy).to eq 'THANK YOU'
+      context 'and in stock' do
+        it "says 'THANK YOU'" do
+          expect(subject.candy).to eq 'THANK YOU'
+        end
+        it 'adds :candy in vending tray' do
+          expect{ subject.candy }.to change{ subject.vending_tray }
+            .from([]).to([:candy])
+        end      
+        it 'makes change of one dime' do
+          expect{ subject.candy }.to change{
+            subject.coin_tray.select{|coin| coin.type == :dime }.size
+          }.from(0).to(1)
+        end
+        it 'reduces :candy stock by 1' do
+          expect{ subject.candy }
+            .to change{ subject.send(:vending_stock)[:candy] }.from(10).to(9)
+        end
       end
-      it 'adds :candy in vending tray' do
-        expect{ subject.candy }.to change{ subject.vending_tray }
-          .from([]).to([:candy])
+      context 'but out of stock' do
+        before { subject.send(:vending_stock)[:candy] = 0 }
+        it "says 'SOLD OUT'" do
+          expect(subject.candy).to eq 'SOLD OUT'
+        end
+        it 'does not change vending tray' do
+          expect{ subject.candy }.not_to change{ subject.vending_tray }
+        end
+        it 'does not change coin tray' do
+          expect{ subject.candy }.not_to change{ subject.coin_tray }
+        end
+        it 'preserves the balance' do
+          expect{ subject.candy }.not_to change{ subject.display }
+        end
+        it 'does not change :candy stock' do
+          expect{ subject.candy }
+            .not_to change{ subject.send(:vending_stock)[:candy] }
+        end
       end      
-      it 'makes change of one dime' do
-        expect{ subject.candy }.to change{
-          subject.coin_tray.select{|coin| coin.type == :dime }.size
-        }.from(0).to(1)
-      end
     end
 
     context 'with insufficient money' do
@@ -186,26 +286,4 @@ RSpec.describe VendingMachine do
     end
   end
 
-  describe '#coin_return' do
-    context 'with no balance' do
-      it 'does not change coin tray' do
-        expect{ subject.coin_return }.not_to change{ subject.coin_tray }
-      end
-      it 'does not change display' do
-        expect{ subject.coin_return }.not_to change{ subject.display }
-      end
-    end
-    context 'with a $0.75 balance' do
-      before { 3.times{ subject.insert(quarter) } }
-      it 'changes display to INSERT COINS' do
-        expect{ subject.coin_return }.to change{ subject.display }
-          .from('Balance: $0.75').to('INSERT COINS')
-      end
-      it 'deposits three quarters in coin tray' do
-        expect{ subject.coin_return }.to change{
-          subject.coin_tray.select{|coin| coin.type == :quarter }.size
-        }.from(0).to(3)
-      end
-    end
-  end
 end

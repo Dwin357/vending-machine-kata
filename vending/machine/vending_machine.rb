@@ -4,9 +4,12 @@ class VendingMachine
   attr_accessor :coin_tray, :vending_tray
 
   def initialize
-    @coin_tray = []
-    @vending_tray = []
+    @coin_tray     = []
     @coin_receptor = CoinReceptor.new
+
+    @vending_stock = initial_stock
+    @vending_tray  = []
+
     @notice = nil
   end
 
@@ -38,24 +41,53 @@ class VendingMachine
 
   private
 
-  attr_reader :coin_receptor
+  attr_reader :coin_receptor, :vending_stock
   attr_accessor :notice
 
 
   def vend(selection, price)
-    if sufficient_balance?(price)
-      coin_receptor.sale(price)
-      dispense(selection)
-      make_change
-      self.notice = 'THANK YOU'
-    else
-      self.notice = 'PRICE $' + display_money(price)
-    end
+    make_sale(selection, price) if validate_sale(selection, price)
     display
   end
 
+  def make_sale(selection, price)
+    coin_receptor.sale(price)
+    dispense(selection)
+    make_change
+    self.notice = 'THANK YOU'
+  end
+
+  def validate_sale(selection, price)
+    unless sufficient_stock?(selection)
+      self.notice = 'SOLD OUT'
+      return false
+    end
+    unless sufficient_balance?(price)
+      self.notice = 'PRICE $' + display_money(price)
+      return false
+    end
+    true
+  end
+  
+  def sufficient_stock?(selection)
+    vending_stock[selection] > 0
+  end
+
   def dispense(selection)
-    vending_tray << selection
+    vending_tray << decrement_stock(selection)
+  end
+
+  def decrement_stock(selection)
+    vending_stock[selection] -= 1
+    selection
+  end
+
+  def initial_stock
+    {
+      chips: 10,
+      cola:  10,
+      candy: 10
+    }
   end
 
   def sufficient_balance?(amount)
