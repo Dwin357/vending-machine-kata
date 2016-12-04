@@ -1,11 +1,11 @@
-require_relative '../components/coin_receptor'
+require_relative '../components/coin_register'
 
 class VendingMachine
   attr_accessor :coin_tray, :vending_tray
 
   def initialize
     @coin_tray     = []
-    @coin_receptor = CoinReceptor.new
+    @coin_register = CoinRegister.new
 
     @vending_stock = initial_stock
     @vending_tray  = []
@@ -18,7 +18,7 @@ class VendingMachine
   end
 
   def insert(coin)
-    self.coin_tray << coin_receptor.insert(coin)
+    self.coin_tray << coin_register.insert(coin)
     coin_tray.compact!
     display
   end
@@ -41,7 +41,7 @@ class VendingMachine
 
   private
 
-  attr_reader :coin_receptor, :vending_stock
+  attr_reader :coin_register, :vending_stock
   attr_accessor :notice
 
 
@@ -51,7 +51,7 @@ class VendingMachine
   end
 
   def make_sale(selection, price)
-    coin_receptor.sale(price)
+    coin_register.sale(price)
     dispense(selection)
     make_change
     self.notice = 'THANK YOU'
@@ -91,21 +91,21 @@ class VendingMachine
   end
 
   def sufficient_balance?(amount)
-    coin_receptor.balance >= amount
+    coin_register.balance >= amount
   end
 
   def make_change
-    self.coin_tray += coin_receptor.make_change
+    self.coin_tray += coin_register.make_change
   end
 
 
 
   def display_default
-    coin_receptor.balance == 0 ? 'INSERT COINS' : display_balance
+    coin_register.balance == 0 ? 'INSERT COINS' : display_balance
   end
   
   def display_balance
-    'Balance: $' + display_money(coin_receptor.balance)
+    'Balance: $' + display_money(coin_register.balance)
   end
 
   def display_money(amount)

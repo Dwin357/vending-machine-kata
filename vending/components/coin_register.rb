@@ -1,6 +1,6 @@
 require_relative '../tender/coin'
 
-class CoinReceptor
+class CoinRegister
   attr_reader :balance
 
   def initialize

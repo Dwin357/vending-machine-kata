@@ -1,10 +1,10 @@
-require_relative '../../../vending/components/coin_receptor'
+require_relative '../../../vending/components/coin_register'
 require_relative '../../../vending/tender/coin'
 require_relative '../../../vending/tender/tender'
 
-RSpec.describe CoinReceptor do
+RSpec.describe CoinRegister do
 
-  subject { CoinReceptor.new }
+  subject { CoinRegister.new }
 
   let(:nickel)  { Coin.new(:nickel) }
   let(:penny)   { Coin.new(:penny) }
