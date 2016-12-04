@@ -1,4 +1,4 @@
-require_relative '../components/coin_receptor.rb'
+require_relative '../components/coin_receptor'
 
 class VendingMachine
   attr_accessor :coin_tray, :vending_tray
@@ -18,6 +18,10 @@ class VendingMachine
     self.coin_tray << coin_receptor.insert(coin)
     coin_tray.compact!
     display
+  end
+
+  def coin_return
+    make_change
   end
 
   def cola

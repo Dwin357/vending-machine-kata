@@ -1,4 +1,6 @@
 require_relative '../../../vending/machine/vending_machine'
+require_relative '../../../vending/tender/coin'
+require_relative '../../../vending/tender/tender'
 
 RSpec.describe VendingMachine do
 
@@ -180,6 +182,29 @@ RSpec.describe VendingMachine do
       end
       it 'does not change vending tray' do
         expect{subject.candy}.not_to change{ subject.vending_tray }
+      end
+    end
+  end
+
+  describe '#coin_return' do
+    context 'with no balance' do
+      it 'does not change coin tray' do
+        expect{ subject.coin_return }.not_to change{ subject.coin_tray }
+      end
+      it 'does not change display' do
+        expect{ subject.coin_return }.not_to change{ subject.display }
+      end
+    end
+    context 'with a $0.75 balance' do
+      before { 3.times{ subject.insert(quarter) } }
+      it 'changes display to INSERT COINS' do
+        expect{ subject.coin_return }.to change{ subject.display }
+          .from('Balance: $0.75').to('INSERT COINS')
+      end
+      it 'deposits three quarters in coin tray' do
+        expect{ subject.coin_return }.to change{
+          subject.coin_tray.select{|coin| coin.type == :quarter }.size
+        }.from(0).to(3)
       end
     end
   end
