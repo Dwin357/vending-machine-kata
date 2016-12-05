@@ -18,7 +18,7 @@ class VendingMachine
   end
 
   def insert(coin)
-    self.coin_tray << coin_register.insert(coin)
+    coin_tray << coin_register.insert(coin)
     coin_tray.compact!
     display
   end
@@ -39,11 +39,10 @@ class VendingMachine
     vend(:candy, 65)
   end
 
-  private
+  protected
 
   attr_reader :coin_register, :vending_stock
   attr_accessor :notice
-
 
   def vend(selection, price)
     make_sale(selection, price) if validate_sale(selection, price)
@@ -68,7 +67,7 @@ class VendingMachine
     end
     true
   end
-  
+
   def sufficient_stock?(selection)
     vending_stock[selection] > 0
   end
@@ -98,26 +97,20 @@ class VendingMachine
     self.coin_tray += coin_register.make_change
   end
 
-
-
   def display_default
-    coin_register.balance == 0 ? display_prompt : display_balance
+    coin_register.balance.zero? ? display_prompt : display_balance
   end
 
   def display_prompt
     coin_register.change_avaliable? ? 'INSERT COINS' : 'EXACT CHANGE ONLY'
   end
-  
+
   def display_balance
     'Balance: $' + display_money(coin_register.balance)
   end
 
   def display_money(amount)
-    # hack that needs to be cleaned up
-    # need to look up float/string methods, but no internet at the moment
-    formated = (amount / 100.0).to_s
-    formated += '0' if formated[-2] == '.'
-    formated
+    format('%.2f', (amount / 100.0))
   end
 
   def display_notice

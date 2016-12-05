@@ -3,7 +3,6 @@ require_relative '../../../vending/tender/coin'
 require_relative '../../../vending/tender/tender'
 
 RSpec.describe VendingMachine do
-
   subject { VendingMachine.new }
 
   let(:nickel)  { Coin.new(:nickel) }
@@ -18,8 +17,8 @@ RSpec.describe VendingMachine do
     end
     context 'a penny' do
       it 'returns the penny to the coin tray' do
-        expect{ subject.insert(penny) }
-          .to change{ subject.coin_tray }.from(['pen']).to(['pen', penny])
+        expect { subject.insert(penny) }
+          .to change { subject.coin_tray }.from(['pen']).to(['pen', penny])
       end
       it 'displays INSERT COINS after inserting' do
         subject.insert(penny)
@@ -33,10 +32,10 @@ RSpec.describe VendingMachine do
         subject.insert quarter
       end
       it 'does not change the coin tray' do
-        expect{ subject.insert nickel }.not_to change{ subject.coin_tray }
+        expect { subject.insert nickel }.not_to change { subject.coin_tray }
       end
       it 'adds 5 to display balance' do
-        expect{ subject.insert nickel }.to change{ subject.display }
+        expect { subject.insert nickel }.to change { subject.display }
           .from('Balance: $0.25').to('Balance: $0.30')
       end
     end
@@ -47,10 +46,10 @@ RSpec.describe VendingMachine do
         subject.insert quarter
       end
       it 'does not change the coin tray' do
-        expect{ subject.insert dime }.not_to change{ subject.coin_tray }
+        expect { subject.insert dime }.not_to change { subject.coin_tray }
       end
       it 'adds 10 to display balance' do
-        expect{ subject.insert dime }.to change{ subject.display }
+        expect { subject.insert dime }.to change { subject.display }
           .from('Balance: $0.25').to('Balance: $0.35')
       end
     end
@@ -61,10 +60,10 @@ RSpec.describe VendingMachine do
         subject.insert dime
       end
       it 'does not change the coin tray' do
-        expect{ subject.insert quarter }.not_to change{ subject.coin_tray }
+        expect { subject.insert quarter }.not_to change { subject.coin_tray }
       end
       it 'adds 25 to display balance' do
-        expect{ subject.insert quarter }.to change{ subject.display }
+        expect { subject.insert quarter }.to change { subject.display }
           .from('Balance: $0.10').to('Balance: $0.35')
       end
     end
@@ -73,21 +72,21 @@ RSpec.describe VendingMachine do
   describe '#coin_return' do
     context 'with no balance' do
       it 'does not change coin tray' do
-        expect{ subject.coin_return }.not_to change{ subject.coin_tray }
+        expect { subject.coin_return }.not_to change { subject.coin_tray }
       end
       it 'does not change display' do
-        expect{ subject.coin_return }.not_to change{ subject.display }
+        expect { subject.coin_return }.not_to change { subject.display }
       end
     end
     context 'with a $0.75 balance' do
-      before { 3.times{ subject.insert(quarter) } }
+      before { 3.times { subject.insert(quarter) } }
       it 'changes display to INSERT COINS' do
-        expect{ subject.coin_return }.to change{ subject.display }
+        expect { subject.coin_return }.to change { subject.display }
           .from('Balance: $0.75').to('INSERT COINS')
       end
       it 'deposits three quarters in coin tray' do
-        expect{ subject.coin_return }.to change{
-          subject.coin_tray.select{|coin| coin.type == :quarter }.size
+        expect { subject.coin_return }.to change {
+          subject.coin_tray.select { |coin| coin.type == :quarter }.size
         }.from(0).to(3)
       end
     end
@@ -95,7 +94,7 @@ RSpec.describe VendingMachine do
 
   describe '#display' do
     context 'with a notice and no balance' do
-      before{ subject.send(:notice=, 'message') }
+      before { subject.send(:notice=, 'message') }
       it 'displays the message exactly once' do
         expect(subject.display).to eq 'message'
         expect(subject.display).not_to eq 'message'
@@ -109,14 +108,14 @@ RSpec.describe VendingMachine do
       it 'displays the message exactly once' do
         expect(subject.display).to eq 'message'
         expect(subject.display).not_to eq 'message'
-      end      
+      end
     end
     context 'with no message' do
       context 'and no balance' do
         context 'and sufficient change' do
           it "displays 'INSERT COINS' repeatedly" do
             expect(subject.display).to eq 'INSERT COINS'
-            expect(subject.display).to eq 'INSERT COINS'          
+            expect(subject.display).to eq 'INSERT COINS'
           end
         end
         context 'and insufficient change' do
@@ -126,7 +125,7 @@ RSpec.describe VendingMachine do
           end
           it "displays 'EXACT CHANGE ONLY' repeatedly" do
             expect(subject.display).to eq 'EXACT CHANGE ONLY'
-            expect(subject.display).to eq 'EXACT CHANGE ONLY'          
+            expect(subject.display).to eq 'EXACT CHANGE ONLY'
           end
         end
       end
@@ -142,23 +141,23 @@ RSpec.describe VendingMachine do
 
   describe '#cola' do
     context 'with $1.25' do
-      before { 5.times{ subject.insert(quarter) } }
+      before { 5.times { subject.insert(quarter) } }
       context 'with sufficient stock' do
         it "says 'THANK YOU'" do
           expect(subject.cola).to eq 'THANK YOU'
         end
         it 'adds :cola in vending tray' do
-          expect{ subject.cola }.to change{ subject.vending_tray }
+          expect { subject.cola }.to change { subject.vending_tray }
             .from([]).to([:cola])
         end
         it 'makes change of one quarter' do
-          expect{ subject.cola }.to change{
-            subject.coin_tray.select{|coin| coin.type == :quarter }.size
+          expect { subject.cola }.to change {
+            subject.coin_tray.select { |coin| coin.type == :quarter }.size
           }.from(0).to(1)
         end
         it 'reduces :cola stock by 1' do
-          expect{ subject.cola }
-            .to change{ subject.send(:vending_stock)[:cola] }.from(10).to(9)
+          expect { subject.cola }
+            .to change { subject.send(:vending_stock)[:cola] }.from(10).to(9)
         end
       end
 
@@ -168,17 +167,17 @@ RSpec.describe VendingMachine do
           expect(subject.cola).to eq 'SOLD OUT'
         end
         it 'does not change vending tray' do
-          expect{ subject.cola }.not_to change{ subject.vending_tray }
+          expect { subject.cola }.not_to change { subject.vending_tray }
         end
         it 'does not change coin tray' do
-          expect{ subject.cola }.not_to change{ subject.coin_tray }
+          expect { subject.cola }.not_to change { subject.coin_tray }
         end
         it 'does not change :cola stock' do
-          expect{ subject.cola }
-            .not_to change{ subject.send(:vending_stock)[:cola] }
+          expect { subject.cola }
+            .not_to change { subject.send(:vending_stock)[:cola] }
         end
         it 'preserves the balance' do
-          expect{ subject.cola }.not_to change{ subject.display }
+          expect { subject.cola }.not_to change { subject.display }
         end
       end
     end
@@ -188,7 +187,7 @@ RSpec.describe VendingMachine do
         expect(subject.cola).to eq 'PRICE $1.00'
       end
       it 'does not change vending tray' do
-        expect{subject.cola}.not_to change{ subject.vending_tray }
+        expect { subject.cola }.not_to change { subject.vending_tray }
       end
     end
   end
@@ -202,17 +201,17 @@ RSpec.describe VendingMachine do
           expect(subject.chips).to eq 'THANK YOU'
         end
         it 'adds :chips in vending tray' do
-          expect{ subject.chips }.to change{ subject.vending_tray }
+          expect { subject.chips }.to change { subject.vending_tray }
             .from([]).to([:chips])
-        end      
+        end
         it 'makes change of one dime' do
-          expect{ subject.chips }.to change{
-            subject.coin_tray.select{|coin| coin.type == :dime }.size
+          expect { subject.chips }.to change {
+            subject.coin_tray.select { |coin| coin.type == :dime }.size
           }.from(0).to(1)
         end
         it 'reduces :chips stock by 1' do
-          expect{ subject.chips }
-            .to change{ subject.send(:vending_stock)[:chips] }.from(10).to(9)
+          expect { subject.chips }
+            .to change { subject.send(:vending_stock)[:chips] }.from(10).to(9)
         end
       end
       context 'but out of stock' do
@@ -221,19 +220,19 @@ RSpec.describe VendingMachine do
           expect(subject.chips).to eq 'SOLD OUT'
         end
         it 'does not change vending tray' do
-          expect{ subject.chips }.not_to change{ subject.vending_tray }
+          expect { subject.chips }.not_to change { subject.vending_tray }
         end
         it 'does not change coin tray' do
-          expect{ subject.chips }.not_to change{ subject.coin_tray }
+          expect { subject.chips }.not_to change { subject.coin_tray }
         end
         it 'preserves the balance' do
-          expect{ subject.chips }.not_to change{ subject.display }
+          expect { subject.chips }.not_to change { subject.display }
         end
         it 'does not change :chips stock' do
-          expect{ subject.chips }
-            .not_to change{ subject.send(:vending_stock)[:chips] }
+          expect { subject.chips }
+            .not_to change { subject.send(:vending_stock)[:chips] }
         end
-      end      
+      end
     end
 
     context 'with insufficient money' do
@@ -241,7 +240,7 @@ RSpec.describe VendingMachine do
         expect(subject.chips).to eq 'PRICE $0.50'
       end
       it 'does not change vending tray' do
-        expect{subject.chips}.not_to change{ subject.vending_tray }
+        expect { subject.chips }.not_to change { subject.vending_tray }
       end
     end
   end
@@ -254,17 +253,17 @@ RSpec.describe VendingMachine do
           expect(subject.candy).to eq 'THANK YOU'
         end
         it 'adds :candy in vending tray' do
-          expect{ subject.candy }.to change{ subject.vending_tray }
+          expect { subject.candy }.to change { subject.vending_tray }
             .from([]).to([:candy])
-        end      
+        end
         it 'makes change of one dime' do
-          expect{ subject.candy }.to change{
-            subject.coin_tray.select{|coin| coin.type == :dime }.size
+          expect { subject.candy }.to change {
+            subject.coin_tray.select { |coin| coin.type == :dime }.size
           }.from(0).to(1)
         end
         it 'reduces :candy stock by 1' do
-          expect{ subject.candy }
-            .to change{ subject.send(:vending_stock)[:candy] }.from(10).to(9)
+          expect { subject.candy }
+            .to change { subject.send(:vending_stock)[:candy] }.from(10).to(9)
         end
       end
       context 'but out of stock' do
@@ -273,19 +272,19 @@ RSpec.describe VendingMachine do
           expect(subject.candy).to eq 'SOLD OUT'
         end
         it 'does not change vending tray' do
-          expect{ subject.candy }.not_to change{ subject.vending_tray }
+          expect { subject.candy }.not_to change { subject.vending_tray }
         end
         it 'does not change coin tray' do
-          expect{ subject.candy }.not_to change{ subject.coin_tray }
+          expect { subject.candy }.not_to change { subject.coin_tray }
         end
         it 'preserves the balance' do
-          expect{ subject.candy }.not_to change{ subject.display }
+          expect { subject.candy }.not_to change { subject.display }
         end
         it 'does not change :candy stock' do
-          expect{ subject.candy }
-            .not_to change{ subject.send(:vending_stock)[:candy] }
+          expect { subject.candy }
+            .not_to change { subject.send(:vending_stock)[:candy] }
         end
-      end      
+      end
     end
 
     context 'with insufficient money' do
@@ -293,9 +292,8 @@ RSpec.describe VendingMachine do
         expect(subject.candy).to eq 'PRICE $0.65'
       end
       it 'does not change vending tray' do
-        expect{subject.candy}.not_to change{ subject.vending_tray }
+        expect { subject.candy }.not_to change { subject.vending_tray }
       end
     end
   end
-
 end

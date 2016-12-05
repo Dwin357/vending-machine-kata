@@ -15,7 +15,7 @@ class CoinRegister
       add_balance value_of coin
       nil
     else
-      return coin
+      coin
     end
   end
 
@@ -25,15 +25,14 @@ class CoinRegister
 
   def make_change
     change = []
-    while balance > 0 do
-      case 
-      when balance >= 25
+    while balance > 0
+      if balance >= 25
         subtract_balance(25)
         change << dispense_coin(:quarter)
-      when balance >= 10
+      elsif balance >= 10
         subtract_balance(10)
         change << dispense_coin(:dime)
-      when balance >= 5
+      elsif balance >= 5
         subtract_balance(5)
         change << dispense_coin(:nickel)
       end
@@ -42,29 +41,27 @@ class CoinRegister
   end
 
   def change_avaliable?
-    # the general formula for this is
+    # since denomenations are constants, these combinations do not need to be
+    # progrmatically derived, but the the general formula for this would be
     # from (highest denomenation - lowest denomenation)
     # to zero
     # step lowest denomentation
     # perform |value|
-    #   assert value exactly acheivible w/ coin_stock 
-
-    # however, since denomenation are constants,
-    # these combinations do not need to be progrmatically derived
+    #   assert value exactly acheivible w/ coin_stock
     coin_stock[:nickel].size > 1 &&
-    coin_stock[:dime].size > 1 &&
-    (coin_stock[:nickel].size > 2 || coin_stock[:dime].size > 2)
+      coin_stock[:dime].size > 1 &&
+      (coin_stock[:nickel].size > 2 || coin_stock[:dime].size > 2)
   end
 
-  private
+  protected
 
   attr_reader :coin_stock
 
   def initial_stock
     {
-      nickel:  Array.new(10).map{ Coin.new(:nickel) },
-      dime:    Array.new(10).map{ Coin.new(:dime) },
-      quarter: Array.new(10).map{ Coin.new(:quarter)}
+      nickel:  Array.new(10).map { Coin.new(:nickel) },
+      dime:    Array.new(10).map { Coin.new(:dime) },
+      quarter: Array.new(10).map { Coin.new(:quarter) }
     }
   end
 
@@ -85,9 +82,9 @@ class CoinRegister
   end
 
   def valid?(coin)
-    accepted_tender.map{|_, atrib| atrib[:properties]}.any? do |known|
-      known[:weight] == coin.weight && 
-      known[:size] == coin.diameter
+    accepted_tender.map { |_, atrib| atrib[:properties] }.any? do |known|
+      known[:weight] == coin.weight &&
+        known[:size] == coin.diameter
     end
   end
 
@@ -96,13 +93,11 @@ class CoinRegister
   end
 
   def type_of(coin)
-    type, _ = accepted_tender.find do |_, known| 
-      known[:properties] == {weight: coin.weight, size: coin.diameter}
+    type, = accepted_tender.find do |_, known|
+      known[:properties] == { weight: coin.weight, size: coin.diameter }
     end
     type
   end
-
-
 
   def accepted_tender
     tender = LEGAL_TENDER.dup
